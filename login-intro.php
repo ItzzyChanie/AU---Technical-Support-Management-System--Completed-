@@ -20,6 +20,7 @@ if (isset($_POST['btnlogin'])) {
                 $_SESSION['usertype'] = $accounts['usertype'];
                 header("location:index.php");
                 exit();
+                
             } else {
                 $error_message = "Incorrect login details or account is inactive.";
             }
