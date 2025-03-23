@@ -128,7 +128,7 @@ mysqli_close($link);
 
         <form action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method = "POST">
             <div class = "form-group">
-                <label>Ticket Number:</label>
+                <label>Your Ticket Number:</label>
                 <input type = "text" class = "form-control" name = "ticketNumber" value = "<?php echo $ticketNumber; ?>" readonly>
             </div>
 
