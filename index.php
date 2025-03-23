@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("location: login-intro.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang = "en">
 <head>
@@ -67,7 +75,9 @@
 
 <body>
     <div class = "form-container">
-        <h2>WELCOME!<br>Please select your System</h2>
+        <h2>Welcome, <?php echo $_SESSION['username']; ?>!
+        <br><hr style = "width: 100%; border: px solidrgb(142, 139, 139); position: relative; bottom: 10px;">
+        Please select your System</h2>
         <a href = "ticket-management.php">Ticket Management</a>
         <br>
         <a href = "login-intro.php" class = "back-button">Back</a>
