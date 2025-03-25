@@ -12,15 +12,15 @@ if (isset($_POST['btnlogin'])) {
         if (mysqli_stmt_execute($stmt)) {
             $result = mysqli_stmt_get_result($stmt);
 
-            if (mysqli_num_rows($result) > 0) {
+            if (mysqli_num_rows($result) > 0) 
+            {
                 $accounts = mysqli_fetch_array($result, MYSQLI_ASSOC);
                 session_start();
-
                 $_SESSION['username'] = $accounts['username'];
-                $_SESSION['usertype'] = $accounts['usertype'];
+                $_SESSION['usertype'] = $accounts['usertype']; // e.g. "USER", "ADMINISTRATOR", "TECHNICAL"
                 header("location:index.php");
                 exit();
-                
+
             } else {
                 $error_message = "Incorrect login details or account is inactive.";
             }
@@ -324,7 +324,7 @@ if (isset($_POST['btnlogin'])) {
 </head>
 
 <body>
-    <header>
+<header>
         <div class = "buttons">
             <button class = "btn login" id = "loginBtn"><i class = "fas fa-sign-in-alt"></i> LOGIN</button>
             <button class = "btn btn-secondary signup">Sign Up</button>
@@ -337,7 +337,7 @@ if (isset($_POST['btnlogin'])) {
             <h1>ARELLANO UNIVERSITY</h1>
         </div>
 
-        <div class = "header-links">
+        <div class="header-links">
             <a href = "#">Account Management</a>
             <a href = "#">Equipment Management</a>
             <a href = "#">Arellano FB Page</a>
@@ -354,10 +354,11 @@ if (isset($_POST['btnlogin'])) {
         &copy; 2025 Finals - Arellano University. All rights reserved.
     </footer>
 
-    <!-- The Modal -->
-    <div id=  "loginModal" class = "modal">
+    <!-- The Login Modal -->
+    <div id = "loginModal" class = "modal">
         <div class = "modal-dialog modal-dialog-centered">
             <div class = "modal-content p-4" style = "border-radius: 10px;">
+
                 <div class = "modal-header">
                     <h2 class = "modal-title w-100 text-center font-weight-bold">Ticket Management System</h2>
                     <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
@@ -367,15 +368,17 @@ if (isset($_POST['btnlogin'])) {
 
                 <div class = "modal-body">
                     <form method = "post" action = "login-intro.php">
+
                         <div class = "form-group text-left">
                             <label for = "txtusername" class = "font-weight-bold">Username:</label>
                             <input type = "text" class = "form-control" id = "txtusername" name = "txtusername" placeholder = "Enter your username" required>
                         </div>
 
-                        <div class = "form-group text-left">
+                        <div class="form-group text-left">
                             <label for = "txtpassword" class = "font-weight-bold">Password:</label>
-                            <input type = "password" class = "form-control" id = "txtpassword" name = "txtpassword" placeholder = "Enter your password" required>
+                            <input type = "password" class = "form-control" id ="txtpassword" name = "txtpassword" placeholder = "Enter your password" required>
                         </div>
+
                         <button type = "submit" class = "btn btn-primary btn-block" name = "btnlogin">Login</button>
                     </form>
 
