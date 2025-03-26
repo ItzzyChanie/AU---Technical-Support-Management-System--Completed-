@@ -311,7 +311,7 @@ $current_user = $_SESSION['username'];
                         <th><i class='fas fa-ticket-alt' style='margin-right: 10px;'></i> TICKET NUMBER</th>
                         <th>PROBLEM</th>
                         <th>DATE</th>
-                        <th>TIME</th>
+                        <th>TIME CREATED</th>
                         <th>STATUS</th>
                         <th class='action'>ACTION</th>
                       </tr></thead><tbody>";
