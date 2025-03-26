@@ -13,6 +13,7 @@ $current_user = $_SESSION['username'];
     <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel = "stylesheet" href = "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link rel = "stylesheet" href = "darkmode.css">
     
     <script src = "https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src = "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -284,20 +285,46 @@ $current_user = $_SESSION['username'];
     
         <!-- Table header -->
         <?php if($usertype === "TECHNICAL"): ?>
-            <div class = "table-header">
-                <h3>Tickets Assigned to You</h3>
+        <div class = "table-header">
+        <h3>Tickets Assigned to You</h3>
+            <div class = "dark-mode-toggle-container">
+                    <i class = "fas fa-sun light-icon"></i>
+                <label class = "dark-mode-toggle">
+                    <input type = "checkbox" id = "darkModeToggle">
+                    <span class = "slider"></span>
+                </label>
+                <i class = "fas fa-moon dark-icon"></i>
             </div>
+        </div>
 
         <?php elseif($usertype === "ADMINISTRATOR"): ?>
             <div class = "table-header">
                 <h3>Table of Ticket Management</h3>
+                <div class = "dark-mode-toggle-container">
+                    <i class = "fas fa-sun light-icon"></i>
+                    <label class = "dark-mode-toggle">
+                        <input type = "checkbox" id = "darkModeToggle">
+                        <span class = "slider"></span>
+                    </label>
+                    <i class = "fas fa-moon dark-icon"></i>
+                </div>
             </div>
 
         <?php else: // Regular User ?>
-            <div class = "table-header" style = "justify-content: space-between;">
-                <h3>Table of Ticket Management</h3>
+        <div class = "table-header" style = "justify-content: space-between; align-items: center;">
+            <h3>Table of Ticket Management</h3>
+            <div class = "d-flex align-items-center">
+                <div class = "dark-mode-toggle-container mr-4">
+                    <i class = "fas fa-sun light-icon"></i>
+                    <label class = "dark-mode-toggle">
+                        <input type ="checkbox" id="darkModeToggle">
+                        <span class = "slider"></span>
+                    </label>
+                    <i class = "fas fa-moon dark-icon"></i>
+                </div>
                 <a href = "create-ticket.php" class = "btn-create"><i class = "fas fa-plus"></i> Create Ticket</a>
             </div>
+        </div>
         <?php endif; ?>
     
         <?php
@@ -813,6 +840,27 @@ $current_user = $_SESSION['username'];
         document.getElementById('deletedOkBtn').addEventListener('click', function() {
             window.location.reload();
         });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleInput = document.getElementById('darkModeToggle');
+    
+        // Check and set initial state from localStorage
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            toggleInput.checked = true;
+        }
+
+        // Toggle dark mode
+        toggleInput.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.removeItem('darkMode');
+            }
+        });
+    });
     </script>
 </body>
 </html>

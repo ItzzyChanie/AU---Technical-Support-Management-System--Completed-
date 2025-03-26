@@ -1,0 +1,116 @@
+body.dark-mode {
+    background-color: #282828;
+    color: #e0e0e0;
+}
+
+body.dark-mode .main-content {
+    background-color: #282828;
+}
+
+body.dark-mode table {
+    background-color: transparent;
+}
+
+body.dark-mode td {
+    background-color: #383838 !important;
+    color: #e0e0e0;
+    border-bottom: 1px solid #555;
+}
+body.dark-mode .modal-content {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+body.dark-mode .modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+body.dark-mode .modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+body.dark-mode .modal-title {
+    color: #000;
+}
+
+body.dark-mode .modal-body {
+    color: #000;
+}
+
+body.dark-mode .modal-body strong {
+    color: #333;
+}
+
+body.dark-mode .modal-footer .btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+body.dark-mode .modal-footer .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.dark-mode-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dark-mode-toggle-container .light-icon {
+    position: relative;
+    left: 2px;
+    top: 1px;
+}
+
+.dark-mode-toggle-container .light-icon,
+.dark-mode-toggle-container .dark-icon {
+    color: #989fa5;
+    font-size: 1.2rem;
+}
+
+.dark-mode-toggle {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    top: 5px;
+}
+
+.dark-mode-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.dark-mode-toggle input:checked + .slider {
+    background-color: #2196F3;
+}
+
+.dark-mode-toggle input:checked + .slider:before {
+    transform: translateX(30px);
+}
