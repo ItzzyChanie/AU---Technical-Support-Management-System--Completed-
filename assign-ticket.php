@@ -80,8 +80,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         mysqli_stmt_bind_param($updateStmt, "sss", $dateAssigned, $assignedTo, $ticketNumber);
 
         if (mysqli_stmt_execute($updateStmt)) {
-            $success = true;
+            // Insert log entry
+            $logSql = "INSERT INTO tbllogs (datelog, timelog, action, module, performedto, performedby) VALUES (?, ?, ?, ?, ?, ?)";
 
+            if ($logStmt = mysqli_prepare($link, $logSql)) 
+            {
+                $date = date("Y-m-d");
+                $time = date("H:i:s");
+                $action = "ASSIGN";
+                $module = "ticket";
+                $username = $_SESSION['username'];
+                mysqli_stmt_bind_param($logStmt, "ssssss", $date, $time, $action, $module, $ticketNumber, $username);
+                mysqli_stmt_execute($logStmt);
+                mysqli_stmt_close($logStmt);
+            }
+            
+            $success = true;
         } else {
             $error = "Error updating ticket: " . mysqli_error($link);
         }

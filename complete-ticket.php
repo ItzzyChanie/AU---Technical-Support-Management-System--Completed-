@@ -53,6 +53,21 @@ if ($stmt = mysqli_prepare($link, $sql_update)) {
     mysqli_stmt_bind_param($stmt, "ss", $dateCompleted, $ticketNumber);
     
     if (mysqli_stmt_execute($stmt)) {
+        // Insert log entry
+        $logSql = "INSERT INTO tbllogs (datelog, timelog, action, module, performedto, performedby) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        if ($logStmt = mysqli_prepare($link, $logSql)) 
+            {
+                $date = date("Y-m-d");
+                $time = date("H:i:s");
+                $action = "COMPLETE";
+                $module = "ticket";
+                $username = $_SESSION['username'];
+                mysqli_stmt_bind_param($logStmt, "ssssss", $date, $time, $action, $module, $ticketNumber, $username);
+                mysqli_stmt_execute($logStmt);
+                mysqli_stmt_close($logStmt);
+            }
+        
         echo json_encode(['success' => true]);
     }
     else {
@@ -63,4 +78,6 @@ if ($stmt = mysqli_prepare($link, $sql_update)) {
 } else {
     echo json_encode(['success' => false, 'error' => 'Error preparing update statement.']);
 }
+
+mysqli_close($link);
 ?>
