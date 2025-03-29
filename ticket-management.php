@@ -356,7 +356,9 @@ $current_user = $_SESSION['username'];
                     echo "<td class='action-btns'>";
                     
                     if ($usertype === "TECHNICAL") {
-                        // For technical account: only "Complete" button is displayed.
+                        // For technical account: add Details button and Complete button
+                        echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
+                        
                         if ($row['Status'] === "ONGOING") {
                             echo "<button class='btn btn-primary btn-sm' onclick='confirmComplete(\"$ticketId\")'>Complete</button>";
                         } else {

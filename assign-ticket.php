@@ -49,6 +49,23 @@ if ($resultTech = mysqli_query($link, $sqlTech))
     exit();
 }
 
+// Get current assigned technician
+$currentAssignee = '';
+$sqlCurrent = "SELECT AssignedTo FROM tbltickets WHERE TicketNumber = ?";
+
+if ($stmtCurrent = mysqli_prepare($link, $sqlCurrent)) {
+    mysqli_stmt_bind_param($stmtCurrent, "s", $ticketNumber);
+
+    if (mysqli_stmt_execute($stmtCurrent)) {
+        $result = mysqli_stmt_get_result($stmtCurrent);
+        
+        if ($row = mysqli_fetch_assoc($result)) {
+            $currentAssignee = $row['AssignedTo'];
+        }
+    }
+    mysqli_stmt_close($stmtCurrent);
+}
+
 $success = false; // Flag for successful assignment
 
 // Process form submission
@@ -136,7 +153,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <select name = "assignedTo" id = "assignedTo" class = "form-control" required>
                     <option value = "">--Select Technician--</option>
                     <?php foreach ($technicians as $tech): ?>
-                        <option value="<?php echo htmlspecialchars($tech); ?>"><?php echo htmlspecialchars($tech); ?></option>
+                        <option value = "<?php echo htmlspecialchars($tech); ?>" <?php echo ($tech === $currentAssignee) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($tech); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -181,5 +199,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
     </script>
     <?php endif; ?>
+
 </body>
 </html>
