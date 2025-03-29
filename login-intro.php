@@ -190,7 +190,7 @@ if (isset($_POST['btnlogin'])) {
             width: 100%;
             height: 100%;
             background: linear-gradient(blue, red); /* Blue at top, red at bottom */
-            opacity: 0.4; /* Slightly low opacity */
+            opacity: 0.7; /* Slightly low opacity */
             z-index: 1;
         }
 
