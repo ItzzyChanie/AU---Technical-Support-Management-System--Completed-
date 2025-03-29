@@ -4,7 +4,7 @@ if (!isset($_SESSION['username']) || $_SESSION['usertype'] !== 'ADMINISTRATOR') 
     header("location: login-intro.php");
     exit();
 }
-require_once "config.php";
+require_once "config.php";  
 
 // Get ticket number from GET
 if (!isset($_GET['ticketNumber'])) {
