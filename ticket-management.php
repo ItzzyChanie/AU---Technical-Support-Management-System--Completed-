@@ -389,11 +389,17 @@ $current_user = $_SESSION['username'];
                         } else {
                             echo "<button class='btn btn-danger btn-sm' disabled><i class='fas fa-trash'></i></button>";
                         }
-                    } 
+                    }
                     else {
                         // For regular user account: display icon-only buttons for Details, Update, and Delete.
                         echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
-                        echo "<a href='update-ticket.php?ticketNumber=$ticketId' class='btn btn-primary btn-sm'><i class='fas fa-edit'></i></a>";
+                        
+                        // Update button: disabled if status is "CLOSED"
+                        if ($row['Status'] === "CLOSED") {
+                            echo "<button class='btn btn-primary btn-sm' disabled><i class='fas fa-edit'></i></button>";
+                        } else {
+                            echo "<a href='update-ticket.php?ticketNumber=$ticketId' class='btn btn-primary btn-sm'><i class='fas fa-edit'></i></a>";
+                        }
                         
                         // Delete button for regular users: enabled only if status is "CLOSED"
                         if ($row['Status'] === "CLOSED") {
