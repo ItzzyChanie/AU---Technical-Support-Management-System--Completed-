@@ -351,7 +351,7 @@ if (isset($_POST['btnlogin'])) {
     </div>
 
     <footer>
-        &copy; 2025 Finals - Arellano University. All rights reserved.
+        &copy; Copyright 2025, Jefferson B. Palceso.
     </footer>
 
     <!-- The Login Modal -->

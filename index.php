@@ -9,33 +9,64 @@ $usertype = $_SESSION['usertype'];
 ?>
 
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
 <head>
-  <meta charset = "UTF-8">
-  <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Select Management System</title>
-  <link rel = "stylesheet" href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
   <style>
+    /* Add new header styles */
+    .header {
+      background-color: #004ea8;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+    .header img {
+      width: 60px;
+      height: auto;
+      margin-right: 15px;
+    }
+    .header h1 {
+      color: white;
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    /* Adjust body to account for fixed header */
     body {
       height: 100vh;
       margin: 0;
-      background-color: #004ea8;
+      background-color: rgb(255, 255, 255);
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       font-family: Arial, sans-serif;
+      padding-top: 90px;
+      padding-bottom: 60px;
     }
     .welcome-section {
       text-align: center;
-      color: white;
+      color: #004ea8;
       padding: 20px;
       margin-top: 30px;
       z-index: 10;
     }
     .welcome-section h2 {
       font-size: 28px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .welcome-section h3 {
+      font-size: 18px;
       margin-bottom: 10px;
       font-weight: bold;
     }
@@ -87,7 +118,7 @@ $usertype = $_SESSION['usertype'];
       border-radius: 10px;
       backdrop-filter: blur(5px);
     }
-    /* Ticket Management (default for ADMINISTRATOR/USER): centered */
+    /* Ticket Management (default positioning) */
     .ticket-management {
       bottom: 280px;
       left: 50%;
@@ -97,24 +128,28 @@ $usertype = $_SESSION['usertype'];
     .ticket-management:hover {
       transform: translateX(-50%) scale(1.02);
     }
-    /* For TECHNICAL: move Ticket Management to the left */
+    /* For TECHNICAL and USER accounts: alternate positioning */
     .ticket-management.left {
       bottom: 280px;
       left: 50px;
       transform: none;
     }
+    .ticket-management.right {
+      bottom: 280px;
+      right: 50px;
+      transform: none;
+    }
     .ticket-management.left:hover {
       transform: scale(1.02);
     }
-    /* Equipment Management for ADMINISTRATOR (default): positioned to the right */
+    /* Equipment Management: positioned to the right (or center) */
     .equipment-management {
-      top: 150px;
+      bottom: 280px;
       right: 50px;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><text x="50" y="50" text-anchor="middle" dy=".3em" font-size="50">🛠️</text></svg>');
     }
-    /* For TECHNICAL: center Equipment Management */
     .equipment-management.center {
-      top: 150px;
+      bottom: 280px;
       left: 50%;
       right: auto;
       transform: translateX(-50%);
@@ -127,6 +162,12 @@ $usertype = $_SESSION['usertype'];
       top: 150px;
       left: 50px;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><text x="50" y="50" text-anchor="middle" dy=".3em" font-size="50">👥</text></svg>');
+    }
+    /* New separate CSS for ADMINISTRATOR Ticket Management */
+    .admin-ticket-management {
+      bottom: 200px; /* Adjust this value to move the link closer to the bottom */
+      left: 50%;
+      transform: translateX(-50%);
     }
     .back-button {
       position: absolute;
@@ -146,45 +187,73 @@ $usertype = $_SESSION['usertype'];
       color: rgb(11,106,222);
       border: 1px solid rgb(11,106,222);
     }
+    /* Add footer styles */
+    .footer {
+      background-color: rgb(4, 54, 111);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      font-size: 14px;
+    }
   </style>
 </head>
 
 <body>
-  <div class = "welcome-section">
+  <!-- Add header -->
+  <div class="header">
+    <img src="pictures/au-logo.png" alt="AU Logo">
+    <h1>Ticket Management System</h1>
+  </div>
+
+  <div class="welcome-section">
     <h2>Welcome, <?php echo $_SESSION['username']; ?>!</h2>
-    <p>Please Select your System</p>
+    <h3>Usertype, <?php echo $_SESSION['usertype']; ?></h3>
   </div>
 
   <?php if ($usertype === 'ADMINISTRATOR'): ?>
-    <div class = "management-link account-management" onclick = "location.href='account-management.php'">
+    <div class="management-link account-management" onclick="location.href='account-management.php'">
       <span>Account Management System</span>
     </div>
 
-    <div class = "management-link equipment-management" onclick = "location.href='equipment-management.php'">
+    <div class="management-link equipment-management" onclick="location.href='equipment-management.php'">
       <span>Equipment Management System</span>
     </div>
 
-    <div class = "management-link ticket-management" onclick = "location.href='ticket-management.php'">
+    <!-- ADMINISTRATOR now uses a separate CSS class for Ticket Management -->
+    <div class="management-link ticket-management admin-ticket-management" onclick="location.href='ticket-management.php'">
       <span>Ticket Management System</span>
     </div>
 
   <?php elseif ($usertype === 'TECHNICAL'): ?>
     <!-- TECHNICAL sees Equipment and Ticket Management -->
-    <div class = "management-link equipment-management right" onclick = "location.href='equipment-management.php'">
+    <div class="management-link equipment-management right" onclick="location.href='equipment-management.php'">
       <span>Equipment Management System</span>
     </div>
 
-    <div class = "management-link ticket-management left" onclick = "location.href='ticket-management.php'">
+    <div class="management-link ticket-management left" onclick="location.href='ticket-management.php'">
       <span>Ticket Management System</span>
     </div>
 
   <?php elseif ($usertype === 'USER'): ?>
-    <!-- USER sees only Ticket Management -->
-    <div class = "management-link ticket-management" onclick = "location.href='ticket-management.php'">
+    <!-- USER sees Equipment and Ticket Management like TECHNICAL -->
+    <div class="management-link equipment-management right" onclick="location.href='equipment-management.php'">
+      <span>Equipment Management System</span>
+    </div>
+
+    <div class="management-link ticket-management left" onclick="location.href='ticket-management.php'">
       <span>Ticket Management System</span>
     </div>
   <?php endif; ?>
 
-  <a href = "login-intro.php" class = "back-button">Logout</a>
+  <a href="login-intro.php" class="back-button">Logout</a>
+
+  <!-- Add footer -->
+  <div class="footer">
+    <p>&copy; Copyright 2025, Jefferson B. Palceso.</p>
+  </div>
 </body>
 </html>

@@ -5,5 +5,5 @@ unset($_SESSION['username']);
 unset($_SESSION['usertype']);
 
 //redirect to the login page
-header("location: login.php");
+header("location: login-intro.php");
 ?>
