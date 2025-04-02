@@ -346,9 +346,9 @@ $current_user = $_SESSION['username'];
                 while ($row = mysqli_fetch_array($result)) 
                 {
                     // Escape TicketNumber for safe JavaScript usage.
-                    $ticketId = addslashes($row['TicketNumber']);
+                    $ticketId = htmlspecialchars($row['TicketNumber']); // Properly escape the ticket number
                     echo "<tr>";
-                    echo "<td><i class='fas fa-ticket-alt' style='margin-right: 20px;'></i>" . $row['TicketNumber'] . "</td>";
+                    echo "<td><i class='fas fa-ticket-alt' style='margin-right: 20px;'></i>" . $ticketId . "</td>";
                     echo "<td>" . $row['Problem'] . "</td>";
                     echo "<td>" . (isset($row['DateCreated']) ? date('Y-m-d', strtotime($row['DateCreated'])) : 'N/A') . "</td>";
                     echo "<td>" . (isset($row['DateCreated']) ? date('H:i:s', strtotime($row['DateCreated'])) : 'N/A') . "</td>";
@@ -366,11 +366,11 @@ $current_user = $_SESSION['username'];
                         }
                     } 
                     else if ($usertype === "ADMINISTRATOR") { 
-                        // For administrator account: display icon-only buttons.
+                        // For administrator account: modified assign button logic
                         echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
                         
-                        // Enable assign button only if status is PENDING or ON-GOING, disable if FOR APPROVAL or CLOSED.
-                        if ($row['Status'] === "Pending" || $row['Status'] === "ONGOING") {
+                        // Enable assign button for PENDING, ONGOING, and FOR APPROVAL status
+                        if ($row['Status'] === "Pending" || $row['Status'] === "ONGOING" || $row['Status'] === "FOR APPROVAL") {
                             echo "<a href='assign-ticket.php?ticketNumber=$ticketId' class='btn btn-primary btn-sm'><i class='fas fa-user-check'></i></a>";
                         } else {
                             echo "<a href='#' class='btn btn-primary btn-sm disabled' tabindex='-1' aria-disabled='true'><i class='fas fa-user-check'></i></a>";
@@ -383,7 +383,7 @@ $current_user = $_SESSION['username'];
                             echo "<button class='btn btn-success btn-sm' disabled><i class='fas fa-check'></i></button>";
                         }
     
-                        // Delete button: enabled only if status is "CLOSED" for ADMINISTRATOR
+                        // Delete button: enabled only if status is "CLOSED"
                         if ($row['Status'] === "CLOSED") {
                             echo "<button class='btn btn-danger btn-sm' onclick='showDeleteConfirm(\"$ticketId\")'><i class='fas fa-trash'></i></button>";
                         } else {
@@ -391,14 +391,14 @@ $current_user = $_SESSION['username'];
                         }
                     }
                     else {
-                        // For regular user account: display icon-only buttons for Details, Update, and Delete.
+                        // For regular user account: modified update button logic
                         echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
                         
-                        // Update button: disabled if status is "CLOSED"
-                        if ($row['Status'] === "CLOSED") {
-                            echo "<button class='btn btn-primary btn-sm' disabled><i class='fas fa-edit'></i></button>";
-                        } else {
+                        // Update button: enabled only if status is "PENDING"
+                        if ($row['Status'] === "Pending") {
                             echo "<a href='update-ticket.php?ticketNumber=$ticketId' class='btn btn-primary btn-sm'><i class='fas fa-edit'></i></a>";
+                        } else {
+                            echo "<button class='btn btn-primary btn-sm' disabled><i class='fas fa-edit'></i></button>";
                         }
                         
                         // Delete button for regular users: enabled only if status is "CLOSED"
@@ -489,7 +489,7 @@ $current_user = $_SESSION['username'];
                 
                 if ($stmt = mysqli_prepare($link, $sql)) {
                     $searchvalue = '%' . $_POST['txtsearch'] . '%';
-                    mysqli_stmt_bind_param($stmt, "ssss", $_SESSION['username'], $searchvalue, $searchvalue, $searchvalue);
+                    mysqli_stmt_bind_param($stmt, "ssss", $current_user, $searchvalue, $searchvalue, $searchvalue);
                     
                     if (mysqli_stmt_execute($stmt)) {
                         $result = mysqli_stmt_get_result($stmt);
@@ -503,7 +503,7 @@ $current_user = $_SESSION['username'];
                 $sql = "SELECT * FROM tbltickets WHERE CreatedBy = ? ORDER BY DateCreated DESC";
 
                 if ($stmt = mysqli_prepare($link, $sql)) {
-                    mysqli_stmt_bind_param($stmt, "s", $_SESSION['username']);
+                    mysqli_stmt_bind_param($stmt, "s", $current_user);
                     
                     if (mysqli_stmt_execute($stmt)) {
                         $result = mysqli_stmt_get_result($stmt);

@@ -5,29 +5,35 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-date_default_timezone_set('UTC');
-$ticketNumber = date('YmdHis');
+// Generate ticket number only once when the page is first loaded
+if (!isset($_SESSION['current_ticket_number'])) {
+    $_SESSION['current_ticket_number'] = date('YmdHis'); // Format: YearMonthDayHourMinuteSecond
+}
+
 $username = $_SESSION['username'];
-$dateCreated = date('Y-m-d H:i:s');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     require_once "config.php";
-    $problem = $_POST['problem'];
-    $details = $_POST['details'];
-    $status = 'Pending';
+    // Use the stored ticket number instead of generating a new one
+    $ticketNumber = $_SESSION['current_ticket_number'];
+    $problem = trim($_POST['problem']);
+    $details = trim($_POST['details']);
+    $createdBy = $username;
+    $status = "Pending";
 
-    $sql = "INSERT INTO tbltickets (TicketNumber, Problem, Details, Status, CreatedBy, DateCreated) VALUES (?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO tbltickets (TicketNumber, Problem, Details, CreatedBy, Status, DateCreated) 
+            VALUES (?, ?, ?, ?, ?, NOW())";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt, "ssssss", $ticketNumber, $problem, $details, $status, $username, $dateCreated);
+        mysqli_stmt_bind_param($stmt, "sssss", $ticketNumber, $problem, $details, $createdBy, $status);
 
-        if (mysqli_stmt_execute($stmt)) 
-        {
+        if (mysqli_stmt_execute($stmt)) {
+            // Clear the stored ticket number after successful insertion
+            unset($_SESSION['current_ticket_number']);
             // Insert log
             $logSql = "INSERT INTO tbllogs (datelog, timelog, action, module, performedto, performedby) VALUES (?, ?, ?, ?, ?, ?)";
 
-            if ($logStmt = mysqli_prepare($link, $logSql)) 
-            {
+            if ($logStmt = mysqli_prepare($link, $logSql)) {
                 $date = date("Y-m-d");
                 $time = date("H:i:s");
                 $action = "CREATE";
@@ -36,19 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 mysqli_stmt_execute($logStmt);
                 mysqli_stmt_close($logStmt);
             }
-            echo "<script>
-                    window.onload = function() {
-                        document.getElementById('successModalMessage').innerText = 'Ticket Successfully Created!';
-                        $('#successModal').modal('show');
-                    };
-                  </script>";
+            header("location: ticket-management.php");
+            exit();
         } else {
-            echo "ERROR: Could not execute query: $sql. " . mysqli_error($link);
+            echo "Error: Could not execute the query.";
         }
-    } else {
-        echo "ERROR: Could not prepare query: $sql. " . mysqli_error($link);
+        mysqli_stmt_close($stmt);
     }
-    mysqli_stmt_close($stmt);
     mysqli_close($link);
 }
 ?>
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method = "POST">
                 <div class = "form-group">
                     <label>Your Ticket Number:</label>
-                    <input type = "text" class = "form-control" value = "<?php echo $ticketNumber; ?>" readonly>
+                    <input type = "text" class = "form-control" value = "<?php echo $_SESSION['current_ticket_number']; ?>" readonly>
                 </div>
 
                 <div class = "form-group">
@@ -123,31 +123,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <textarea name = "details" class = "form-control" rows = "5" required></textarea>
                 </div>
 
-                <button type = "submit" class = "btn btn-primary">Save</button>
+                <button type = "submit" name = "submit" class = "btn btn-primary">Save</button>
                 <a href = "ticket-management.php" class = "btn btn-secondary">Cancel</a>
             </form>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id = "successModal" class = "modal fade" tabindex = "-1" role = "dialog">
-        <div class = "modal-dialog" role = "document">
-            <div class = "modal-content">
-                <div class = "modal-header">
-                    <h5 class = "modal-title">Success</h5>
-                    <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
-                        <span aria-hidden = "true">&times;</span>
-                    </button>
-                </div>
-
-                <div class = "modal-body">
-                    <p id = "successModalMessage"></p>
-                </div>
-
-                <div class = "modal-footer">
-                    <a href = "ticket-management.php" class = "btn btn-secondary">Close</a>
-                </div>
-            </div>
         </div>
     </div>
 
