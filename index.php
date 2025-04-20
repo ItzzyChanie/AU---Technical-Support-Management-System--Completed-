@@ -206,7 +206,7 @@ $usertype = $_SESSION['usertype'];
   <!-- Add header -->
   <div class="header">
     <img src="pictures/au-logo.png" alt="AU Logo">
-    <h1>Ticket Management System</h1>
+    <h1>AU - Technical Support Management System</h1>
   </div>
 
   <div class="welcome-section">
@@ -215,7 +215,7 @@ $usertype = $_SESSION['usertype'];
   </div>
 
   <?php if ($usertype === 'ADMINISTRATOR'): ?>
-    <div class="management-link account-management" onclick="location.href='account-management.php'">
+    <div class="management-link account-management" onclick="location.href='accounts-management.php'">
       <span>Account Management System</span>
     </div>
 
@@ -238,7 +238,7 @@ $usertype = $_SESSION['usertype'];
       <span>Ticket Management System</span>
     </div>
 
-  <?php elseif ($usertype === 'USER'): ?>
+  <?php elseif ($usertype === 'STAFF'): ?>
     <!-- USER sees Equipment and Ticket Management like TECHNICAL -->
     <div class="management-link equipment-management right" onclick="location.href='equipment-management.php'">
       <span>Equipment Management System</span>

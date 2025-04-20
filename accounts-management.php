@@ -258,42 +258,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
             pointer-events: none;
             opacity: 0.5;
         }
-        .btn-update {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 5px 9px;
-        margin-right: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        }
-        .btn-update:hover {
-        background-color: #0056b3;
-        }
-        .btn-delete {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        }
-        .btn-delete:hover {
-        background-color: #c82333;
-        }
+
         /* Dark mode: Only the body changes background & text color */
         body.dark-mode {
             background-color: #282828;
             color: #ffffff;
         }
+
         /* Dark Mode Toggle Switch Styles */
         .dark-mode-toggle {
             display: inline-flex;
             align-items: center;
             cursor: default; /* Default cursor for the container */
         }
+        
         .dark-mode-toggle .fa-moon {
             color:rgb(167, 165, 165); /* Change icon color to grey */
             margin: 0 8px;
@@ -364,20 +342,91 @@ $current_page = basename($_SERVER['PHP_SELF']);
             color: #ffffff; /* Ensure text is visible in dark mode */
             border-bottom: 1px solid #555; /* Adjust border color for dark mode */
         }
+
+        /* Add styles for update and delete buttons */
+        .update-btn {
+            background-color: #007bff; /* Match update button color */
+            color: #ffffff;
+            padding: 7px 8px; /* Adjust padding for size */
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px; /* Add spacing between buttons */
+        }
+        .update-btn i {
+            font-size: 16px; /* Match icon size */
+        }
+        .update-btn:hover {
+            background-color:rgb(5, 100, 201); /* Hover effect */
+            color: #ffffff; /* Keep font color unchanged */
+        }
+        .delete-btn {
+            background-color: #d9534f; /* Match delete button color */
+            color: #ffffff;
+            padding: 7px 9px; /* Adjust padding for size */
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn i {
+            font-size: 16px; /* Match icon size */
+        }
+        .delete-btn:hover {
+            background-color: #c82333; /* Hover effect */
+            color: #ffffff; /* Keep font color unchanged */
+        }
+        
+        /* Simple modal styles */
+        .modal-simple .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .modal-simple .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
     </style>
+
     <script>
-        function confirmDelete(assetNumber) {
+        function confirmDelete(username) {
+            // Open the modal and set the username dynamically
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            confirmDeleteBtn.href = 'delete-equipment.php?AssetNumber=' + encodeURIComponent(assetNumber);
+            confirmDeleteBtn.href = 'delete-account.php?username=' + encodeURIComponent(username);
             $('#confirmDeleteModal').modal({ backdrop: 'static', keyboard: false });
         }
-    </script>
-    <script>
+
+        // Removed the "localhost says" alert message
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('success') === 'true') {
+                // Automatically show the success modal
+                $("#successModal").modal("show");
+                // Remove the query param to prevent re-triggering on refresh
+                history.replaceState(null, '', window.location.pathname);
+            }
+        });
+
+        function openAddAccountModal() {
+            $('#addAccountModal').modal('show');
+        }
+
+        // Function to open the Update Account modal and populate fields
+        function openUpdateAccountModal(username, usertype) {
+            document.getElementById('updateUsername').value = username;
+            document.getElementById('updateUsertype').value = usertype;
+            $('#updateAccountModal').modal('show');
+        }
         function confirmLogout(event) {
             event.preventDefault();
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.href = 'logout.php';
-            }
+            // Show the logout confirmation modal
+            $('#logoutConfirmModal').modal({ backdrop: 'static', keyboard: false });
         }
         // Toggle dark mode: Only toggles body style
         function toggleDarkMode() {
@@ -442,6 +491,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 }
             });
         });
+
+        $(document).ready(function() {
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.get('success') === 'true') {
+                $("#successModal").modal("show");
+                history.replaceState(null, '', window.location.pathname);
+            }
+
+            if (params.get('update_success') === 'true') {
+                $("#updateSuccessModal").modal("show");
+                history.replaceState(null, '', window.location.pathname);
+            }
+        });
     </script>
 </head>
 <body>
@@ -458,11 +521,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="ticket-management.php" class="<?php echo $current_page == 'ticket-management.php' ? 'selected' : ''; ?>">
             <i class="fas fa-ticket-alt"></i> Ticket Table
         </a>
-        <?php if ($_SESSION['usertype'] === 'ADMINISTRATOR'): ?>
-            <a href="accounts-management.php" class="<?php echo $current_page == 'accounts-management.php' ? 'selected' : ''; ?>">
-                <i class="bi bi-person-circle"></i> Accounts Table
-            </a>
-        <?php endif; ?>
+        <a href="accounts-management.php" class="<?php echo $current_page == 'accounts-management.php' ? 'selected' : ''; ?>">
+            <i class="bi bi-person-circle"></i> Accounts Table
+        </a>
         <a href="equipment-management.php" class="<?php echo $current_page == 'equipment-management.php' ? 'selected' : ''; ?>">
             <i class="bi bi-tools"></i> Equipment Table
         </a>
@@ -473,13 +534,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        <?php if (isset($_SESSION['success_message'])): ?>
-            <script>
-                alert("<?php echo $_SESSION['success_message']; ?>");
-            </script>
-            <?php unset($_SESSION['success_message']); ?>
-        <?php endif; ?>
-
         <?php if (isset($_SESSION['username'])): ?>
             <!-- HEADER -->
             <div class="header">
@@ -499,13 +553,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <!-- Title & Actions Container -->
             <div class="title-and-actions">
-                <div class="table-title">Table of Equipment Management</div>
+                <div class="table-title">Table of Accounts Management</div>
                 <div class="actions-container">
-                    <?php if ($_SESSION['usertype'] === 'ADMINISTRATOR' || $_SESSION['usertype'] === 'TECHNICAL'): ?>
-                        <a href="add-equipment.php" class="index-btn">
-                            <i class="fas fa-tools"></i> Add Equipment
-                        </a>
-                    <?php endif; ?>
+                    <!-- Add Account Button -->
+                    <a href="create-account.php" class="index-btn">
+                        <i class="fas fa-user-plus"></i> Add Account
+                    </a>
                     <a href="index.php" class="index-btn">
                         <i class="fas fa-home"></i> Index Page
                     </a>
@@ -520,65 +573,53 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </div>
             </div>
 
-                    <!-- TABLE -->
+            <!-- TABLE -->
             <div class="table-container">
                 <?php
                     function buildtable($result) {
                         if (mysqli_num_rows($result) > 0) {
                             echo "<table>";
                             echo "<thead><tr>
-                                <th>ASSET NUMBER</th>
-                                <th>SERIAL NUMBER</th>
-                                <th>TYPE</th>
-                                <th>BRANCH</th>
+                                <th>USERNAME</th>
+                                <th>USER TYPE</th>
                                 <th>STATUS</th>
-                                <th>CREATED BY</th>";
-                            // Show "Actions" column only for ADMINISTRATOR or TECHNICAL
-                            if ($_SESSION['usertype'] === 'ADMINISTRATOR' || $_SESSION['usertype'] === 'TECHNICAL') {
-                                echo "<th>ACTIONS</th>";
-                            }
+                                <th>CREATED BY</th>
+                                <th>DATE CREATED</th>
+                                <th>ACTIONS</th>
+                            </tr></thead><tbody>";
                             while ($row = mysqli_fetch_array($result)) {
                                 echo "<tr>";
-                                echo "<td>{$row['AssetNumber']}</td>";
-                                echo "<td>{$row['SerialNumber']}</td>";
-                                echo "<td>{$row['Type']}</td>";
-                                echo "<td>{$row['Branch']}</td>";
-                                echo "<td>{$row['Status']}</td>";
-                                echo "<td>{$row['Createdby']}</td>";
-                                // Show Update and Delete buttons only for ADMINISTRATOR or TECHNICAL
-                                if ($_SESSION['usertype'] === 'ADMINISTRATOR' || $_SESSION['usertype'] === 'TECHNICAL') {
-                                    echo "<td>
-                                        <button class='btn-update' onclick=\"window.location.href='update-equipment.php?AssetNumber={$row['AssetNumber']}'\">
-                                            <i class='fas fa-edit'></i>
-                                        </button>
-                                        <button class='btn-delete' onclick=\"confirmDelete('{$row['AssetNumber']}')\">
-                                            <i class='fas fa-trash'></i>
-                                        </button>
-                                    </td>";
-                                }
+                                echo "<td>" . $row['username'] . "</td>";
+                                echo "<td>" . $row['usertype'] . "</td>";
+                                echo "<td>" . $row['status'] . "</td>";
+                                echo "<td>" . $row['createdby'] . "</td>";
+                                echo "<td>" . $row['datecreated'] . "</td>";
+                                echo "<td>";
+                                echo "<a href='update-account.php?username=" . $row['username'] . "&usertype=" . $row['usertype'] . 
+                                    "' class='update-btn'><i class='fas fa-edit'></i></a>"; // Icon only
+                                echo "<a href='#' onclick='confirmDelete(\"" . $row['username'] . "\")' 
+                                class='delete-btn'><i class='fas fa-trash'></i></a>"; // Icon only
+                                echo "</td>";
                                 echo "</tr>";
                             }
-                            echo "</tbody></table>";
+                            echo "</table>";
                         } else {
                             echo "<p>No records found.</p>";
                         }
                     }
 
                     require_once "config.php";
-
                     $sql = isset($_POST['btnsearch']) 
-                    ? "SELECT * FROM tblequipments 
-                       WHERE AssetNumber LIKE ? 
-                          OR SerialNumber LIKE ? 
-                          OR Type LIKE ? 
-                          OR Branch LIKE ?
-                       ORDER BY AssetNumber ASC" // Sort by newest to oldest
-                    : "SELECT * FROM tblequipments ORDER BY AssetNumber ASC"; // Sort by newest to oldest
-                
+                        ? "SELECT * FROM tblaccounts 
+                            WHERE username LIKE ? 
+                                OR usertype LIKE ? 
+                            ORDER BY username ASC" // Sort by datecreated in descending order
+                        : "SELECT * FROM tblaccounts ORDER BY username ASC"; // Default sorting by datecreated DESC
+
                     if ($stmt = mysqli_prepare($link, $sql)) {
                         if (isset($_POST['btnsearch'])) {
                             $searchvalue = '%' . $_POST['txtsearch'] . '%';
-                            mysqli_stmt_bind_param($stmt, "ssss", $searchvalue, $searchvalue, $searchvalue, $searchvalue);
+                            mysqli_stmt_bind_param($stmt, "ss", $searchvalue, $searchvalue);
                         }
                         if (mysqli_stmt_execute($stmt)) {
                             $result = mysqli_stmt_get_result($stmt);
@@ -589,7 +630,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     } else {
                         echo "<p>Error preparing query.</p>";
                     }
-                    ?>
+                ?>
             </div>
         <?php else: header("location: login.php"); exit(); endif; ?>
     </div>
@@ -599,18 +640,63 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="modal-dialog" role="document">
             <div class="modal-content" style="margin-top: 10px; border-radius: 5px;">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel"><i class="fas fa-exclamation-triangle"></i> Delete Equipment Confirmation</h5>
+                    <h5 class="modal-title" id="confirmDeleteModalLabel"><i class="fas fa-exclamation-triangle"></i> Delete Account Confirmation</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to delete this equipment?</p>
+                    <p class="mb-0">Are you sure you want to delete this account?</p>
                 </div>
                 <div class="modal-footer justify-content-end">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simplified Add Account Modal -->
+    <div class="modal fade modal-simple" id="addAccountModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Account</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="create-account.php" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="usertype">User Type</label>
+                            <select class="form-control" id="usertype" name="usertype" required>
+                                <option value="" disabled selected>Select user type</option>
+                                <option value="admin">Admin</option>
+                                <option value="user">User</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer"></div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Account</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -626,7 +712,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-0">Equipment Deleted Successfully!</p>
+                    <p class="mb-0">Account Deleted Successfully!</p>
                 </div>
                 <div class="modal-footer justify-content-end">
                     <button type="button" class="btn" style="background-color: #007bff; color: white;" data-dismiss="modal">Okay</button>
@@ -639,6 +725,53 @@ $current_page = basename($_SERVER['PHP_SELF']);
             $("#successModal").modal("show");
         });
     </script>
-<?php endif; ?>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['update_success']) && $_GET['update_success'] === 'true'): ?>
+    <div class="modal fade" id="updateSuccessModal" tabindex="-1" role="dialog" aria-labelledby="updateSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="margin-top: 10px; border-radius: 5px;">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="updateSuccessModalLabel"><i class="fas fa-check-circle"></i> Success</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Account Updated Successfully!</p>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $("#updateSuccessModal").modal("show");
+        });
+    </script>
+    <?php endif; ?>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" role="dialog" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="margin-top: 10px; border-radius: 5px;">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="logoutConfirmModalLabel"><i class="fas fa-exclamation-circle"></i> Confirm Logout</h5>
+                    <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to logout?</p>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a href="logout.php" class="btn btn-warning">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

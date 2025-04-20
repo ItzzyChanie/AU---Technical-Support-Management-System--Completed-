@@ -82,14 +82,17 @@ $current_user = $_SESSION['username'];
         .logout-btn {
             margin-top: auto;
             width: 100%;
-            text-align: center;
             padding: 10px;
-            background-color: #e02c1c;
-            color: #fff;
-            text-decoration: none;
+            background-color: #d9534f;
+            color: #fff !important;
+            text-decoration: none !important;
             font-size: 16px;
             border-radius: 5px;
             transition: 0.3s;
+            text-align: center; /* Center the text and icon */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
         }
         .logout-btn:hover {
             background-color: #c9302c;
@@ -230,34 +233,41 @@ $current_user = $_SESSION['username'];
 </head>
 
 <body>
-    <div class = "sidebar">
-        <div class = "logo-container">
-            <img src = 'pictures/au-logo.png' alt = 'Logo'>
+    <div class="sidebar">
+        <div class="logo-container">
+            <img src="pictures/au-logo.png" alt="AU Logo">
             <h2>AU - TSMS</h2>
         </div>
-
-        <hr style = "width: 100%; border: 1px solid #bfbbbb;">
-
+        <hr style="width: 100%; border: 1px solid #bfbbbb;">
         <ul>
-            <!-- Account Profile is always visible -->
-            <li><a href = "#" class = "<?php echo $current_page == '#' ? 'selected' : ''; ?>"><i class = "bi bi-person-circle"></i> Account Profile</a></li>
-    
             <!-- Ticket Table is always visible -->
-            <li><a href = "ticket-management.php" class = "<?php echo $current_page == 'ticket-management.php' ? 'selected' : ''; ?>"><i class = "fas fa-ticket-alt"></i> Ticket Table</a></li>
-    
-            <?php if ($usertype === "TECHNICAL"): ?>
-            <!-- For Technical accounts, add Equipment Table -->
-            <li><a href = "#" class = "<?php echo $current_page == '#' ? 'selected' : ''; ?>"><i class = "bi bi-tools"></i> Equipment Table</a></li>
+            <li>
+                <a href="account-profile.php" class="<?php echo $current_page == 'account-profile.php' ? 'selected' : ''; ?>">
+                    <i class="bi bi-person-circle"></i> Account Profile
+                </a>
+                <a href="ticket-management.php" class="<?php echo $current_page == 'ticket-management.php' ? 'selected' : ''; ?>">
+                    <i class="fas fa-ticket-alt"></i> Ticket Table
+                </a>
+            </li>
+            
+            <?php if ($usertype === 'ADMINISTRATOR'): ?>
+                <!-- Accounts Table visible only for administrators -->
+                <li>
+                    <a href="accounts-management.php" class="<?php echo $current_page == 'accounts-management.php' ? 'selected' : ''; ?>">
+                        <i class="bi bi-person-circle"></i> Accounts Table
+                    </a>
+                </li>
             <?php endif; ?>
-    
-            <?php if ($usertype === "ADMINISTRATOR"): ?>
-            <!-- For Administrator accounts, keep all existing menu items -->
-            <li><a href = "#" class = "<?php echo $current_page == '#' ? 'selected' : ''; ?>"><i class = "bi bi-person-circle"></i> Account Table</a></li>
-            <li><a href = "#" class = "<?php echo $current_page == '#' ? 'selected' : ''; ?>"><i class = "bi bi-tools"></i> Equipment Table</a></li>
-            <?php endif; ?>
+            <!-- Equipment Table is always visible -->
+            <li>
+                <a href="equipment-management.php" class="<?php echo $current_page == 'equipment-management.php' ? 'selected' : ''; ?>">
+                    <i class="bi bi-tools"></i> Equipment Table
+                </a>
+            </li>
         </ul>
-
-        <a href = "login-intro.php" class = "logout-btn" onclick = "confirmLogout(event)"><i class = "fas fa-sign-out-alt"></i> Logout</a>
+        <a href="logout.php" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
     </div>
     
     <div class="main-content">
@@ -286,20 +296,9 @@ $current_user = $_SESSION['username'];
         <!-- Table header -->
         <?php if($usertype === "TECHNICAL"): ?>
         <div class = "table-header">
-        <h3>Tickets Assigned to You</h3>
-            <div class = "dark-mode-toggle-container">
-                    <i class = "fas fa-sun light-icon"></i>
-                <label class = "dark-mode-toggle">
-                    <input type = "checkbox" id = "darkModeToggle">
-                    <span class = "slider"></span>
-                </label>
-                <i class = "fas fa-moon dark-icon"></i>
-            </div>
-        </div>
-
-        <?php elseif($usertype === "ADMINISTRATOR"): ?>
-            <div class = "table-header">
-                <h3>Table of Ticket Management</h3>
+            <h3>Tickets Assigned to You</h3>
+            <div class = "d-flex align-items-center">
+                <a href = "index.php" class = "btn btn-primary mr-4"><i class = "fas fa-home"></i> Index Page</a>
                 <div class = "dark-mode-toggle-container">
                     <i class = "fas fa-sun light-icon"></i>
                     <label class = "dark-mode-toggle">
@@ -309,11 +308,29 @@ $current_user = $_SESSION['username'];
                     <i class = "fas fa-moon dark-icon"></i>
                 </div>
             </div>
+        </div>
+
+        <?php elseif($usertype === "ADMINISTRATOR"): ?>
+        <div class = "table-header">
+            <h3>Table of Ticket Management</h3>
+            <div class = "d-flex align-items-center">
+                <a href = "index.php" class = "btn btn-primary mr-4"><i class = "fas fa-home"></i> Index Page</a>
+                <div class = "dark-mode-toggle-container">
+                    <i class = "fas fa-sun light-icon"></i>
+                    <label class = "dark-mode-toggle">
+                        <input type = "checkbox" id = "darkModeToggle">
+                        <span class = "slider"></span>
+                    </label>
+                    <i class = "fas fa-moon dark-icon"></i>
+                </div>
+            </div>
+        </div>
 
         <?php else: // Regular User ?>
         <div class = "table-header" style = "justify-content: space-between; align-items: center;">
             <h3>Table of Ticket Management</h3>
             <div class = "d-flex align-items-center">
+                <a href = "index.php" class = "btn btn-primary mr-4"><i class = "fas fa-home"></i> Index Page</a>
                 <div class = "dark-mode-toggle-container mr-4">
                     <i class = "fas fa-sun light-icon"></i>
                     <label class = "dark-mode-toggle">
@@ -360,17 +377,19 @@ $current_user = $_SESSION['username'];
                         echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
                         
                         if ($row['Status'] === "ONGOING") {
-                            echo "<button class='btn btn-primary btn-sm' onclick='confirmComplete(\"$ticketId\")'>Complete</button>";
+                            echo "<button class='btn btn-primary btn-sm' onclick='confirmComplete(\"$ticketId\")'><i class='fas fa-check'></i></button>";
                         } else {
-                            echo "<button class='btn btn-secondary btn-sm' disabled>Complete</button>";
+                            echo "<button class='btn btn-secondary btn-sm' disabled><i class='fas fa-check'></i></button>";
                         }
                     } 
                     else if ($usertype === "ADMINISTRATOR") { 
                         // For administrator account: modified assign button logic
                         echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
                         
-                        // Enable assign button for PENDING, ONGOING, and FOR APPROVAL status
-                        if ($row['Status'] === "Pending" || $row['Status'] === "ONGOING" || $row['Status'] === "FOR APPROVAL") {
+                        // Disable assign button if status is "FOR APPROVAL"
+                        if ($row['Status'] === "FOR APPROVAL") {
+                            echo "<a href='#' class='btn btn-primary btn-sm disabled' tabindex='-1' aria-disabled='true'><i class='fas fa-user-check'></i></a>";
+                        } else if ($row['Status'] === "Pending" || $row['Status'] === "ONGOING") {
                             echo "<a href='assign-ticket.php?ticketNumber=$ticketId' class='btn btn-primary btn-sm'><i class='fas fa-user-check'></i></a>";
                         } else {
                             echo "<a href='#' class='btn btn-primary btn-sm disabled' tabindex='-1' aria-disabled='true'><i class='fas fa-user-check'></i></a>";
@@ -383,7 +402,7 @@ $current_user = $_SESSION['username'];
                             echo "<button class='btn btn-success btn-sm' disabled><i class='fas fa-check'></i></button>";
                         }
     
-                        // Delete button: enabled only if status is "CLOSED"
+                        // Delete button: enabled only for "CLOSED" status
                         if ($row['Status'] === "CLOSED") {
                             echo "<button class='btn btn-danger btn-sm' onclick='showDeleteConfirm(\"$ticketId\")'><i class='fas fa-trash'></i></button>";
                         } else {
@@ -391,18 +410,18 @@ $current_user = $_SESSION['username'];
                         }
                     }
                     else {
-                        // For regular user account: modified update button logic
+                        // For regular user account: modified update and delete button logic
                         echo "<button class='btn btn-warning btn-sm' onclick='showDetails(\"$ticketId\")'><i class='fas fa-info-circle'></i></button>";
-                        
+    
                         // Update button: enabled only if status is "PENDING"
                         if ($row['Status'] === "Pending") {
                             echo "<a href='update-ticket.php?ticketNumber=$ticketId' class='btn btn-primary btn-sm'><i class='fas fa-edit'></i></a>";
                         } else {
                             echo "<button class='btn btn-primary btn-sm' disabled><i class='fas fa-edit'></i></button>";
                         }
-                        
-                        // Delete button for regular users: enabled only if status is "CLOSED"
-                        if ($row['Status'] === "CLOSED") {
+    
+                        // Delete button: enabled for "Pending" and "CLOSED" statuses
+                        if ($row['Status'] === "Pending" || $row['Status'] === "CLOSED") {
                             echo "<button class='btn btn-danger btn-sm' onclick='confirmDelete(\"$ticketId\")'><i class='fas fa-trash'></i></button>";
                         } else {
                             echo "<button class='btn btn-danger btn-sm' disabled><i class='fas fa-trash'></i></button>";
@@ -517,24 +536,23 @@ $current_user = $_SESSION['username'];
         ?>
     
     <!-- Complete Confirmation Modal (for technical accounts) -->
-    <div id = "completeConfirmModal" class = "modal fade" tabindex = "-1" role = "dialog">
-        <div class = "modal-dialog" role = "document">
-
-            <div class = "modal-content">
-                <div class = "modal-header">
-                    <h5 class = "modal-title">Complete Ticket Confirmation</h5>
-                    <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
-                        <span aria-hidden = "true">&times;</span>
+    <div id="completeConfirmModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i> Complete Ticket Confirmation
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
-                <div class = "modal-body">
+                <div class="modal-body">
                     <p>Are you sure you want to complete this ticket?</p>
                 </div>
-
-                <div class = "modal-footer">
-                    <button type = "button" class = "btn btn-secondary" data-dismiss = "modal">Cancel</button>
-                    <button type = "button" class = "btn btn-primary" id = "confirmCompleteBtn">Yes</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmCompleteBtn">Yes</button>
                 </div>
             </div>
         </div>
@@ -564,24 +582,23 @@ $current_user = $_SESSION['username'];
     </div>
     
     <!-- Approve Confirmation Modal (for admin) -->
-    <div id = "approveConfirmModal" class = "modal fade" tabindex = "-1" role = "dialog">
-        <div class = "modal-dialog" role = "document">
-
-            <div class = "modal-content">
-                <div class = "modal-header">
-                    <h5 class = "modal-title">Approve Ticket Confirmation</h5>
-                    <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
-                        <span aria-hidden = "true">&times;</span>
+    <div id="approveConfirmModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i> Approve Ticket Confirmation
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
-                <div class = "modal-body">
-                    <p>Are you sure you want to Approve this Ticket?</p>
+                <div class="modal-body">
+                    <p>Are you sure you want to approve this ticket?</p>
                 </div>
-
-                <div class = "modal-footer">
-                    <button type = "button" class = "btn btn-secondary" data-dismiss = "modal">Cancel</button>
-                    <button type = "button" class = "btn btn-primary" id = "confirmApproveBtn">Yes</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmApproveBtn">Yes</button>
                 </div>
             </div>
         </div>
@@ -611,24 +628,23 @@ $current_user = $_SESSION['username'];
     </div>
     
     <!-- Delete Confirmation Modal (for admin) -->
-    <div id = "deleteConfirmModal" class = "modal fade" tabindex = "-1" role = "dialog">
-        <div class = "modal-dialog" role  = "document">
-
-            <div class = "modal-content">
-                <div class = "modal-header">
-                    <h5 class = "modal-title">Delete Ticket Confirmation</h5>
-                    <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
-                        <span aria-hidden = "true">&times;</span>
+    <div id="deleteConfirmModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle"></i> Delete Ticket Confirmation
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
-                <div class = "modal-body">
+                <div class="modal-body">
                     <p>Are you sure you want to delete this Ticket now?</p>
                 </div>
-
-                <div class = "modal-footer">
-                    <button type = "button" class = "btn btn-secondary" data-dismiss = "modal">Cancel</button>
-                    <button type = "button" class = "btn btn-primary" id = "confirmDeleteBtn">Yes</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                 </div>
             </div>
         </div>
@@ -652,6 +668,29 @@ $current_user = $_SESSION['username'];
 
                 <div class = "modal-footer">
                     <button type = "button" class = "btn btn-primary" id = "deletedOkBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assign Confirmation Modal (for admin) -->
+    <div id="assignConfirmModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i> Assign Ticket Confirmation
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to assign this ticket?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmAssignBtn">Yes</button>
                 </div>
             </div>
         </div>
@@ -865,9 +904,36 @@ $current_user = $_SESSION['username'];
                 localStorage.setItem('darkMode', 'true');
             } else {
                 document.body.classList.remove('dark-mode');
-                localStorage.removeItem('darkMode');
+                localStorage.setItem('darkMode', 'false'); // Ensure consistency across pages
+            }
+
+            // Synchronize dark mode across pages
+            localStorage.setItem('darkModeSync', Date.now());
+        });
+
+        // Listen for changes in dark mode synchronization
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'darkModeSync') {
+                const darkModePreference = localStorage.getItem('darkMode');
+                if (darkModePreference === 'true') {
+                    document.body.classList.add('dark-mode');
+                    toggleInput.checked = true;
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    toggleInput.checked = false;
+                }
             }
         });
+    });
+
+    // Ensure dark mode persists across pages
+    document.addEventListener('DOMContentLoaded', () => {
+        const darkModePreference = localStorage.getItem('darkMode');
+        if (darkModePreference === 'true') {
+            document.body.classList.add('dark-mode');
+            const toggleSwitch = document.getElementById('darkModeToggle');
+            if (toggleSwitch) toggleSwitch.checked = true;
+        }
     });
     </script>
 </body>

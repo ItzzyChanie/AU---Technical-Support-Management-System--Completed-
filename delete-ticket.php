@@ -13,7 +13,7 @@ if (isset($_GET['ticketNumber'])) {
     $username = $_SESSION['username'];
     $usertype = $_SESSION['usertype'];
 
-    // 1) Check if the ticket is CLOSED and belongs to the user or is an admin
+    // 1) Check if the ticket status is PENDING or CLOSED and belongs to the user or is an admin
     $sqlCheck = "SELECT Status, CreatedBy FROM tbltickets WHERE TicketNumber = ?";
 
     if ($stmtCheck = mysqli_prepare($link, $sqlCheck)) 
@@ -24,9 +24,9 @@ if (isset($_GET['ticketNumber'])) {
         $ticketInfo = mysqli_fetch_assoc($resultCheck);
         mysqli_stmt_close($stmtCheck);
 
-        // Check if ticket exists and is CLOSED
-        if (!$ticketInfo || $ticketInfo['Status'] !== 'CLOSED') {
-            echo json_encode(["error" => "Cannot delete this ticket. It must be in CLOSED status."]);
+        // Check if ticket exists and is PENDING or CLOSED
+        if (!$ticketInfo || !in_array($ticketInfo['Status'], ['Pending', 'CLOSED'])) {
+            echo json_encode(["error" => "Cannot delete this ticket. It must be in PENDING or CLOSED status."]);
             exit();
         }
 
@@ -82,4 +82,3 @@ if (isset($_GET['ticketNumber'])) {
 }
 
 mysqli_close($link);
-?>
