@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $date = date("Y-m-d");
                 $time = date("H:i:s");
                 $action = "ASSIGN";
-                $module = "ticket";
+                $module = "Ticket Management";
                 $username = $_SESSION['username'];
                 mysqli_stmt_bind_param($logStmt, "ssssss", $date, $time, $action, $module, $ticketNumber, $username);
                 mysqli_stmt_execute($logStmt);

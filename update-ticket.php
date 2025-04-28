@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
                 $date = date("Y-m-d");
                 $time = date("H:i:s");
                 $action = "UPDATE";
-                $module = "ticket";
+                $module = "Ticket Management";
                 $username = $_SESSION['username'];
                 mysqli_stmt_bind_param($logStmt, "ssssss", $date, $time, $action, $module, $ticketNumber, $username);
                 mysqli_stmt_execute($logStmt);
@@ -156,9 +156,9 @@ mysqli_close($link);
     <div id = "successModal" class = "modal fade" tabindex = "-1" role = "dialog">
         <div class = "modal-dialog" role = "document">
             <div class = "modal-content">
-                <div class = "modal-header">
+                <div class = "modal-header bg-success text-white">
                     <h5 class = "modal-title">Success</h5>
-                    <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
+                    <button type = "button" class = "close text-white" data-dismiss = "modal" aria-label = "Close">
                         <span aria-hidden = "true">&times;</span>
                     </button>
                 </div>
@@ -168,7 +168,7 @@ mysqli_close($link);
                 </div>
 
                 <div class = "modal-footer">
-                    <a href = "ticket-management.php" class = "btn btn-secondary">Close</a>
+                    <a href = "ticket-management.php" class = "btn btn-success">Okay</a>
                 </div>
             </div>
         </div>

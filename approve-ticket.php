@@ -62,7 +62,7 @@ if ($stmt = mysqli_prepare($link, $sql_update)) {
                 $date = date("Y-m-d");
                 $time = date("H:i:s");
                 $action = "APPROVE";
-                $module = "ticket";
+                $module = "Ticket Management";
                 $username = $_SESSION['username'];
                 mysqli_stmt_bind_param($logStmt, "ssssss", $date, $time, $action, $module, $ticketNumber, $username);
                 mysqli_stmt_execute($logStmt);

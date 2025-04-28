@@ -566,30 +566,90 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     require_once "config.php";
 
-                    $sql = isset($_POST['btnsearch']) 
-                    ? "SELECT * FROM tblequipments 
-                       WHERE AssetNumber LIKE ? 
-                          OR SerialNumber LIKE ? 
-                          OR Type LIKE ? 
-                          OR Branch LIKE ?
-                       ORDER BY AssetNumber ASC" // Sort by newest to oldest
-                    : "SELECT * FROM tblequipments ORDER BY AssetNumber ASC"; // Sort by newest to oldest
-                
-                    if ($stmt = mysqli_prepare($link, $sql)) {
-                        if (isset($_POST['btnsearch'])) {
-                            $searchvalue = '%' . $_POST['txtsearch'] . '%';
-                            mysqli_stmt_bind_param($stmt, "ssss", $searchvalue, $searchvalue, $searchvalue, $searchvalue);
-                        }
-                        if (mysqli_stmt_execute($stmt)) {
-                            $result = mysqli_stmt_get_result($stmt);
-                            buildtable($result);
-                        } else {
-                            echo "<p>Error executing query.</p>";
-                        }
-                    } else {
-                        echo "<p>Error preparing query.</p>";
-                    }
-                    ?>
+// Determine if we want to highlight an updated asset
+$updatedAsset = isset($_GET['updatedAsset']) ? $_GET['updatedAsset'] : null;
+
+// Base SELECT and WHERE for search
+$searchMode = isset($_POST['btnsearch']);
+$searchClause = "";
+if ($searchMode) {
+    $searchClause = "WHERE AssetNumber LIKE ? OR SerialNumber LIKE ? OR Type LIKE ? OR Branch LIKE ?";
+}
+
+// Build ORDER BY: put updated asset on top, then by AssetNumber desc
+if ($updatedAsset) {
+    $orderClause = "ORDER BY (AssetNumber = ?) DESC, AssetNumber DESC";
+} else {
+    $orderClause = "ORDER BY AssetNumber DESC";
+}
+
+// Final SQL
+$sql = "SELECT * FROM tblequipments $searchClause $orderClause";
+
+if ($stmt = mysqli_prepare($link, $sql)) {
+    // Bind parameters dynamically
+    if ($searchMode && $updatedAsset) {
+        $searchValue = '%' . $_POST['txtsearch'] . '%';
+        mysqli_stmt_bind_param($stmt, "sssss", $searchValue, $searchValue, $searchValue, $searchValue, $updatedAsset);
+    } elseif ($searchMode) {
+        $searchValue = '%' . $_POST['txtsearch'] . '%';
+        mysqli_stmt_bind_param($stmt, "ssss", $searchValue, $searchValue, $searchValue, $searchValue);
+    } elseif ($updatedAsset) {
+        mysqli_stmt_bind_param($stmt, "s", $updatedAsset);
+    }
+
+    if (mysqli_stmt_execute($stmt)) {
+        $result = mysqli_stmt_get_result($stmt);
+
+        // Build table
+        if (mysqli_num_rows($result) > 0) {
+            echo "<table>";
+            echo "<thead><tr>
+                    <th>ASSET NUMBER</th>
+                    <th>SERIAL NUMBER</th>
+                    <th>TYPE</th>
+                    <th>BRANCH</th>
+                    <th>STATUS</th>
+                    <th>CREATED BY</th>";
+            if ($_SESSION['usertype'] === 'ADMINISTRATOR' || $_SESSION['usertype'] === 'TECHNICAL') {
+                echo "<th>ACTIONS</th>";
+            }
+            echo "</tr></thead><tbody>";
+
+            while ($row = mysqli_fetch_array($result)) {
+                $highlightClass = ($updatedAsset && $row['AssetNumber'] == $updatedAsset) ? "style='background-color: #d1e7dd; font-weight: bold;'" : "";
+                echo "<tr $highlightClass>";
+                echo "<td>{$row['AssetNumber']}</td>";
+                echo "<td>{$row['SerialNumber']}</td>";
+                echo "<td>{$row['Type']}</td>";
+                echo "<td>{$row['Branch']}</td>";
+                echo "<td>{$row['Status']}</td>";
+                echo "<td>{$row['Createdby']}</td>";
+                if ($_SESSION['usertype'] === 'ADMINISTRATOR' || $_SESSION['usertype'] === 'TECHNICAL') {
+                    echo "<td>
+                        <button class='btn-update' onclick=\"window.location.href='update-equipment.php?AssetNumber={$row['AssetNumber']}'\">
+                            <i class='fas fa-edit'></i>
+                        </button>
+                        <button class='btn-delete' onclick=\"confirmDelete('{$row['AssetNumber']}')\">
+                            <i class='fas fa-trash'></i>
+                        </button>
+                    </td>";
+                }
+                echo "</tr>";
+            }
+
+            echo "</tbody></table>";
+        } else {
+            echo "<p>No records found.</p>";
+        }
+
+    } else {
+        echo "<p>Error executing query.</p>";
+    }
+} else {
+    echo "<p>Error preparing query.</p>";
+}
+?>
             </div>
         <?php else: header("location: login.php"); exit(); endif; ?>
     </div>

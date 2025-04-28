@@ -1,4 +1,5 @@
 <?php
+// update-equipment.php
 require_once "config.php";
 include ("session-checker.php");
 
@@ -11,61 +12,79 @@ if (isset($_GET['AssetNumber'])) {
         // Validate Year Model
         if (!preg_match('/^\d{4}$/', $_POST['txtYearModel'])) {
             echo "<script>alert('Year Model should be a 4-digit number.');</script>";
-        } 
-        else {
-            $sql = "UPDATE tblequipments SET SerialNumber = ?, Type = ?, Manufacturer = ?, YearModel = ?, Description = ?, 
-            Branch = ?, Department = ?, Status = ? WHERE AssetNumber = ?";
+        } else {
+            // Corrected SQL without unintended backslashes
+            $sql = "UPDATE tblequipments
+                    SET SerialNumber = ?, Type = ?, Manufacturer = ?, YearModel = ?, Description = ?,
+                        Branch = ?, Department = ?, Status = ?
+                    WHERE AssetNumber = ?";
 
             if ($stmt = mysqli_prepare($link, $sql)) {
-                mysqli_stmt_bind_param($stmt, "sssssssss", $_POST['txtSerialNumber'], 
-                $_POST['cmbtype'], $_POST['txtManufacturer'], $_POST['txtYearModel'], $_POST['txtDescription'], 
-                $_POST['cmbbranch'], $_POST['cmbDepartment'], $_POST['cmbStatus'], $assetNumber);
+                mysqli_stmt_bind_param(
+                    $stmt,
+                    "sssssssss",
+                    $_POST['txtSerialNumber'],
+                    $_POST['cmbtype'],
+                    $_POST['txtManufacturer'],
+                    $_POST['txtYearModel'],
+                    $_POST['txtDescription'],
+                    $_POST['cmbbranch'],
+                    $_POST['cmbDepartment'],
+                    $_POST['cmbStatus'],
+                    $assetNumber
+                );
 
                 if (mysqli_stmt_execute($stmt)) {
                     // Log the update action
                     $log_sql = "INSERT INTO tbllogs (datelog, timelog, action, module, performedto, performedby) VALUES (?, ?, ?, ?, ?, ?)";
-                
                     if ($log_stmt = mysqli_prepare($link, $log_sql)) {
-                        $datelog = date("Y-m-d");
-                        $timelog = date("H:i:s");
-                        $action = "UPDATE";
-                        $module = "Equipment";
+                        $datelog     = date("Y-m-d");
+                        $timelog     = date("H:i:s");
+                        $action      = "UPDATE";
+                        $module      = "Equipment Management";
                         $performedto = $assetNumber;
                         $performedby = $_SESSION['username'];
-                        mysqli_stmt_bind_param($log_stmt, "ssssss", $datelog, $timelog, $action, $module, $performedto, $performedby);
+                        mysqli_stmt_bind_param(
+                            $log_stmt,
+                            "ssssss",
+                            $datelog,
+                            $timelog,
+                            $action,
+                            $module,
+                            $performedto,
+                            $performedby
+                        );
                         mysqli_stmt_execute($log_stmt);
                     }
-                    // Redirect to equipment-management.php with a success message
-                    $_SESSION['success_message'] = "Equipment Successfully Updated!";
-                    header("Location: equipment-management.php");
+
+                    // Redirect to equipment-management.php, showing updated record on top
+                    header("Location: equipment-management.php?success=true&updatedAsset=" . urlencode($assetNumber));
                     exit();
-                    
                 } else {
                     echo "<script>alert('ERROR on updating equipment.');</script>";
                 }
+            } else {
+                echo "<script>alert('ERROR preparing update statement.');</script>";
             }
         }
     } else {
+        // Fetch existing record
         $sql = "SELECT * FROM tblequipments WHERE AssetNumber = ?";
-
         if ($stmt = mysqli_prepare($link, $sql)) {
             mysqli_stmt_bind_param($stmt, "s", $assetNumber);
-
             if (mysqli_stmt_execute($stmt)) {
                 $result = mysqli_stmt_get_result($stmt);
-
                 if (mysqli_num_rows($result) == 1) {
                     $row = mysqli_fetch_array($result);
                     $serialNumber = $row['SerialNumber'];
-                    $type = $row['Type'];
+                    $type         = $row['Type'];
                     $manufacturer = $row['Manufacturer'];
-                    $yearModel = $row['YearModel'];
-                    $description = ""; // Leave description blank
-                    $branch = $row['Branch'];
-                    $department = $row['Department'];
-                    $status = $row['Status'];
-                } 
-                else {
+                    $yearModel    = $row['YearModel'];
+                    $description  = $row['Description'];
+                    $branch       = $row['Branch'];
+                    $department   = $row['Department'];
+                    $status       = $row['Status'];
+                } else {
                     echo "No record found.";
                 }
             }
@@ -108,13 +127,21 @@ if (isset($_GET['AssetNumber'])) {
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             width: 90%;
-            max-width: 1000px;
+            max-width: 800px;
             position: relative;/* Added to establish positioning context */
-            height: 500px;
+            height: 620px;
+        }
+
+        .form-container h1 {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #007bff;
+            margin-bottom: 10px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-top: 25px;
             display: flex;
             flex-direction: column;
         }
@@ -134,6 +161,9 @@ if (isset($_GET['AssetNumber'])) {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 20px; /* Added margin to move it slightly down */
         }
 
         .form-left, .form-right {
@@ -199,9 +229,8 @@ if (isset($_GET['AssetNumber'])) {
 </head>
 
 <body>
-<h1>Update Equipment</h1>
-
-    <div class = "form-container">
+    <div class="form-container">
+        <h1>Update Equipment</h1> <!-- Moved inside the form-container -->
         <form action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . "?AssetNumber=" . $assetNumber; ?>" method = "POST">
             <div class = "form-row">
                 <div class = "form-left">
@@ -301,5 +330,34 @@ if (isset($_GET['AssetNumber'])) {
             </div>
         </form>
     </div>
+
+    <!-- Success Modal for Deletion -->
+    <div class="modal fade" id="deleteSuccessModal" tabindex="-1" aria-labelledby="deleteSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white"> <!-- Green background for header -->
+                    <h5 class="modal-title" id="deleteSuccessModalLabel">Successful!</h5>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Equipment Deleted Successfully!</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="equipment-management.php" class="btn btn-success">Okay</a> <!-- Green "Okay" button -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Example script to trigger the modal (replace with actual logic as needed)
+        function showDeleteSuccessModal() {
+            var deleteSuccessModal = new bootstrap.Modal(document.getElementById('deleteSuccessModal'));
+            deleteSuccessModal.show();
+        }
+
+        // Uncomment the line below to test the modal
+        // showDeleteSuccessModal();
+    </script>
 </body>
 </html>

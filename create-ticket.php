@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
                 $date = date("Y-m-d");
                 $time = date("H:i:s");
                 $action = "CREATE";
-                $module = "ticket";
+                $module = "Ticket Management";
                 mysqli_stmt_bind_param($logStmt, "ssssss", $date, $time, $action, $module, $ticketNumber, $username);
                 mysqli_stmt_execute($logStmt);
                 mysqli_stmt_close($logStmt);

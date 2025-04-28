@@ -16,7 +16,7 @@ if (isset($_GET['AssetNumber'])) {
                 $datelog = date("Y-m-d");
                 $timelog = date("H:i:s");
                 $action = "DELETE";
-                $module = "Equipment";
+                $module = "Equipment Management";
                 $performedby = $_SESSION['username'];
                 mysqli_stmt_bind_param($log_stmt, "ssssss", $datelog, $timelog, $action, $module, $assetNumber, $performedby);
                 mysqli_stmt_execute($log_stmt);

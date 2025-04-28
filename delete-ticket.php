@@ -52,7 +52,7 @@ if (isset($_GET['ticketNumber'])) {
 
             // 3) Insert a log record
             $sqlLog = "INSERT INTO tbllogs (datelog, timelog, action, module, performedto, performedby) 
-                       VALUES (CURDATE(), CURTIME(), 'DELETE', 'ticket', ?, ?)";
+                       VALUES (CURDATE(), CURTIME(), 'DELETE', 'Ticket Management', ?, ?)";
 
             $stmtLog = mysqli_prepare($link, $sqlLog);
             mysqli_stmt_bind_param($stmtLog, "ss", $ticketNumber, $username);
@@ -65,7 +65,7 @@ if (isset($_GET['ticketNumber'])) {
             // Commit the transaction
             mysqli_commit($link);
 
-            echo json_encode(["success" => true]);
+            echo json_encode(["success" => true, "message" => "Okay"]);
             
         } catch (Exception $e) {
             // Rollback the transaction

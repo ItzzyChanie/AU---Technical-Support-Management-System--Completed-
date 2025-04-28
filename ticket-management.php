@@ -846,7 +846,7 @@ $current_user = $_SESSION['username'];
                         <strong>Date Assigned:</strong> ${dateAssigned}<br>
                         <strong>Date Completed:</strong> ${dateCompleted}<br>
                         <strong>Approved By:</strong> ${data.ApprovedBy || 'N/A'}<br>
-                        <strong>Date Approved:</strong> ${data.DateApproved || 'N/A'}
+                        <strong>Date Approved:</strong> ${data.DateApproved ? data.DateApproved.split(' ')[0] : 'N/A'}
                     `;
                     document.getElementById('ticketDetails').innerHTML = details;
                     $('#detailsModal').modal('show');
